@@ -13,7 +13,7 @@ Un calendario sencillo, parecido a Google Calendar, con una bandeja de **pendien
 7. La primera vez que alguien abre la agenda aparece un **recorrido guiado**. Se repite desde **Ayuda**, que también trae guías cortas y preguntas frecuentes.
 8. **Agenda del equipo:** cada integrante entra con su Gmail y todas ven la misma agenda, con los cambios al instante y funcionando sin internet.
 
-**En línea:** la agenda está en https://carloshernandez2222.github.io/fondacio-agenda/fondacio.html y la página de la fundación en https://carloshernandez2222.github.io/fondacio-agenda/ (política de privacidad en `privacidad.html`).
+**En línea:** la agenda está en https://juanmillan19.github.io/fondacio-agenda/fondacio.html y la página de la fundación en https://juanmillan19.github.io/fondacio-agenda/ (política de privacidad en `privacidad.html`). Copia de respaldo, con el mismo contenido y la misma base de datos: https://carloshernandez2222.github.io/fondacio-agenda/.
 
 ## Novedades de la versión 1.2
 
