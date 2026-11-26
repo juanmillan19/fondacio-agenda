@@ -236,6 +236,15 @@ dialog::backdrop{background:rgba(32,33,36,.4)}
 .tour-card.centro{left:50%!important;top:50%!important;transform:translate(-50%,-50%);width:min(440px,calc(100vw - 24px))}
 @media(max-width:600px){.tour-card:not(.centro){left:12px!important;right:12px;width:auto;top:auto!important;bottom:12px}}
 
+/* agenda compartida */
+.nube-b{width:100%;justify-content:flex-start;gap:10px;min-height:52px;border-radius:14px;padding:6px 14px;margin:0 0 12px;text-align:left}
+.nube-t{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.nube-t b{font-weight:500;color:var(--ink)}.nube-t small{font-size:12px;color:var(--ink-2)}
+.nube-p{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
+.nube-p.ok{background:#1E8E3E}.nube-p.esp{background:#E3A008}.nube-p.mal{background:var(--danger)}
+.miembros{list-style:none;margin:8px 0 12px;padding:0}
+.miembros li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;overflow-wrap:anywhere}
+
 /* letra más grande (Ajustes → Apariencia) */
 html.grande .wrap,html.grande dialog{zoom:1.15}
 
@@ -328,6 +337,7 @@ html.grande .wrap,html.grande dialog{zoom:1.15}
 
 <main id="resumen">
   <aside class="lado">
+    <button class="btn nube-b" id="bNube" title="Ver la agenda compartida del equipo"><span class="nube-p"></span><span class="nube-t"><b>Agenda del equipo</b><small id="nubeEst">Solo en este equipo</small></span></button>
     <div class="aviso" id="avEj" hidden><p>Estás viendo <strong>datos de ejemplo</strong> para conocer la agenda.</p>
       <div class="row"><button class="btn sm pri" id="bVaciar">Empezar con mi agenda vacía</button><button class="btn sm" id="bMantener">Mantenerlos</button></div></div>
     <ol class="steps" aria-label="Cómo funciona">
@@ -402,7 +412,7 @@ const mins=h=>{const[a,b]=h.split(":").map(Number);return a*60+b};
 const horaCorta=h=>{if(!h)return"";let[a,b]=h.split(":").map(Number);const p=a>=12?"pm":"am";a=a%12||12;return`${a}${b?":"+pad(b):""} ${p}`};
 /* Cierra una frase con punto sin duplicarlo cuando ya termina en «p. m.» o «a. m.» (DEF-01). */
 const punto=s=>/[.!?]$/.test(s)?s:s+".";
-const VERSION="1.1";
+const VERSION="1.2";
 
 /* Todos usan el mismo formato (compatible con OpenAI), por eso cambiar de proveedor es solo cambiar la dirección, la clave y el modelo. */
 const PROV={
@@ -453,7 +463,7 @@ S.contactos=Array.isArray(S.contactos)?S.contactos:[];
 if(S.ejemplo===undefined)S.ejemplo=S.eventos.length>0&&S.eventos.every(e=>TITULOS_EJEMPLO.includes(e.titulo));
 S.pend.forEach(p=>{if(p.tipo!==undefined)return;const a=analizar(p.texto||"",p.recibido?new Date(p.recibido):null);
   ["tipo","org","persona","plazo","resumen"].forEach(k=>{if(p[k]===undefined)p[k]=a[k]||""});if(!p.titulo&&a.titulo)p.titulo=a.titulo});
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("No se pudo guardar en este navegador")}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("No se pudo guardar en este navegador")}if(window.__nube)nubeSubir()}
 /* El aviso se muestra como "popover" para quedar encima de los diálogos abiertos (si no, el diálogo lo tapa). */
 if("popover" in HTMLElement.prototype)$("#toast").popover="manual";
 function toast(t){const e=$("#toast");e.textContent=t;
@@ -1014,8 +1024,12 @@ function ajustes(){
   ${gTok?`<div class="row" style="margin-top:6px"><button type="button" class="btn sm" id="gOut">Desconectar Google</button></div>`:""}
   <div class="row" style="margin-top:14px"><button class="btn pri">Guardar</button><button type="button" class="btn" id="x">Cancelar</button></div>
   <hr class="sep">
+  <h3>Agenda compartida</h3>
+  <p class="hint" style="margin:0 0 8px" id="nubeHint"></p>
+  <div class="row"><button type="button" class="btn sm" id="dNube">${nubeActiva()?"Ver integrantes":"Compartir con el equipo"}</button></div>
+  <hr class="sep">
   <h3>Tus datos</h3>
-  <p class="hint" style="margin:0 0 8px">La agenda se guarda solo en este navegador. Descarga una copia cada semana: sirve para no perder nada y para pasar la agenda a otro computador. ${c.ultimaCopia?"Última copia: "+esc(hace(c.ultimaCopia))+".":"Todavía no has descargado ninguna copia."}</p>
+  <p class="hint" style="margin:0 0 8px">${c.ultimaCopia?"Última copia: "+esc(hace(c.ultimaCopia))+".":"Todavía no has descargado ninguna copia."}</p>
   <div class="row"><button type="button" class="btn sm" id="dExp">Descargar copia de seguridad</button><button type="button" class="btn sm" id="dImp">Restaurar una copia</button><input type="file" id="fRest" accept=".json,application/json" hidden></div>
   <div class="row" style="margin-top:8px"><button type="button" class="btn sm del" id="dVac">Empezar con la agenda vacía</button><button type="button" class="btn sm" id="dEj">Cargar datos de ejemplo</button></div>
   <hr class="sep">
@@ -1031,6 +1045,7 @@ function ajustes(){
   $("#dImp").onclick=()=>$("#fRest").click();
   $("#fRest").onchange=ev=>{const a=ev.target.files[0];if(a)restaurar(a);ev.target.value=""};
   $("#dVac").onclick=()=>{if(vaciar())cerrar()};
+  $("#dNube").onclick=()=>nubeDialogo();renderNube();
   $("#dEj").onclick=()=>{if(cargarEjemplo())cerrar()};
   $("#aGrande").onchange=ev=>{S.cfg.grande=ev.target.checked;save();aplicarApariencia()};
   f.onsubmit=ev=>{ev.preventDefault();const d=Object.fromEntries(new FormData(f));
@@ -1058,7 +1073,7 @@ function restaurar(archivo){
     const d=c&&c.app==="fondacio-agenda"&&c.datos;
     if(!d||!Array.isArray(d.eventos)||!Array.isArray(d.pend)){toast("Ese archivo no es una copia de Fondacio Agenda");return}
     const cuando=c.creada?" del "+fechaLarga(iso(new Date(c.creada))):"";
-    if(!confirm(`La copia${cuando} tiene ${d.eventos.length} actividades y ${d.pend.length} mensajes. Va a reemplazar lo que hay ahora en este navegador. ¿Continuar?`))return;
+    if(!confirm(`La copia${cuando} tiene ${d.eventos.length} actividades y ${d.pend.length} mensajes. Va a reemplazar lo que hay ahora en la agenda.${nubeActiva()?" Ojo: la agenda es compartida, así que el cambio lo verán todas las integrantes.":""} ¿Continuar?`))return;
     S.eventos=d.eventos;S.pend=d.pend;S.contactos=Array.isArray(d.contactos)?d.contactos:S.contactos;S.chat=Array.isArray(d.chat)?d.chat:[];
     if(d.cfg)S.cfg={...d.cfg,...S.cfg,key:S.cfg.key};
     S.ejemplo=false;save();render();renderChat();cerrar();toast("Copia restaurada");
@@ -1067,11 +1082,11 @@ function restaurar(archivo){
   r.readAsText(archivo);
 }
 function vaciar(){
-  if(!confirm("Se borran todas las actividades, los pendientes y la conversación con el asistente de este navegador. Los ajustes y los correos guardados se conservan. ¿Empezar con la agenda vacía?"))return false;
+  if(!confirm(nubeActiva()?"Se borran TODAS las actividades y los pendientes de la agenda compartida, para todas las integrantes. Descarga antes una copia de seguridad. ¿Empezar con la agenda vacía?":"Se borran todas las actividades, los pendientes y la conversación con el asistente de este navegador. Los ajustes y los correos guardados se conservan. ¿Empezar con la agenda vacía?"))return false;
   S.eventos=[];S.pend=[];S.chat=[];S.ejemplo=false;save();render();renderChat();toast("Listo: tu agenda está vacía");return true;
 }
 function cargarEjemplo(){
-  if(!confirm("Se agregan 3 actividades y 3 mensajes de ejemplo para practicar. ¿Continuar?"))return false;
+  if(!confirm(nubeActiva()?"Se agregan 3 actividades y 3 mensajes de ejemplo a la agenda compartida, y los verán todas las integrantes. ¿Continuar?":"Se agregan 3 actividades y 3 mensajes de ejemplo para practicar. ¿Continuar?"))return false;
   const s=seed();S.eventos.push(...s.eventos);S.pend.push(...s.pend);S.ejemplo=true;save();render();toast("Datos de ejemplo cargados");return true;
 }
 function aplicarApariencia(){document.documentElement.classList.toggle("grande",!!S.cfg.grande)}
@@ -1199,16 +1214,21 @@ function abrirAyuda(){
     <li>Al crear una actividad o al aceptar, abre <strong>Reunión en Google Meet</strong>.</li>
     <li>Marca los correos de los invitados y toca <strong>Crear reunión en Meet</strong>.</li>
     <li>La primera vez Google pide permiso. Si dice «Google no ha verificado esta app», toca <strong>Continuar</strong>.</li></ol></details>
+  <details class="box"><summary>Que todo el equipo vea la misma agenda</summary><ol>
+    <li>Toca <strong>Agenda del equipo</strong> (a la izquierda, o arriba en el celular) y entra con tu Gmail.</li>
+    <li>La coordinación agrega los correos de las demás integrantes en <strong>Agenda compartida</strong>.</li>
+    <li>Cada integrante abre la misma dirección y entra con su correo. Desde ese momento ven las mismas actividades y pendientes, en el computador o el celular.</li></ol></details>
   <details class="box"><summary>No perder la información (copia de seguridad)</summary><ol>
     <li>En <strong>Ajustes</strong> toca <strong>Descargar copia de seguridad</strong> una vez por semana.</li>
     <li>Guarda el archivo en Google Drive o en una USB.</li>
     <li>En otro computador, abre la agenda y en Ajustes toca <strong>Restaurar una copia</strong>.</li></ol></details>
   <h3>Preguntas frecuentes</h3>
-  <details class="box"><summary>Abrí la agenda en otro computador y está vacía</summary><p>Cada navegador guarda su propia agenda. Usa siempre el mismo equipo, o pasa la información con la copia de seguridad.</p></details>
+  <details class="box"><summary>Abrí la agenda en otro computador y está vacía</summary><p>Toca <strong>Agenda del equipo</strong> y entra con tu Gmail: aparece la agenda compartida. Si dice que tu correo no tiene acceso, pídele a la coordinación que te agregue.</p></details>
+  <details class="box"><summary>¿Funciona sin internet?</summary><p>Sí. Lo que hagas sin conexión se guarda en tu equipo y se sube solo cuando vuelve el internet. El botón «Agenda del equipo» dice «Compartida · sin internet» mientras tanto.</p></details>
   <details class="box"><summary>Al responder no se abre WhatsApp</summary><p>En el computador necesitas WhatsApp Web o la aplicación de escritorio con la sesión abierta. Si el navegador bloquea la ventana, permite las ventanas emergentes para esta página.</p></details>
   <details class="box"><summary>La agenda no entendió bien la fecha o la hora</summary><p>Corrígela a mano antes de guardar. Entiende mejor textos como «14 de noviembre», «14/11», «mañana», «el jueves», «3 pm» o «de 3 a 5».</p></details>
   <details class="box"><summary>¿Qué es el Asistente IA y es obligatorio?</summary><p>Es opcional. Con una clave gratuita (en Ajustes) puede leer mensajes enredados, redactar respuestas y contestar preguntas sobre la agenda. Nunca hace cambios sin que tú los apruebes. Sin clave, todo lo demás funciona igual.</p></details>
-  <details class="box"><summary>¿Quién puede ver la información?</summary><p>Solo quien use este navegador. Los mensajes traen datos personales de la comunidad: úsalos solo para coordinar la agenda de la fundación (Ley 1581 de 2012).</p></details>
+  <details class="box"><summary>¿Quién puede ver la información?</summary><p>Si usas la agenda compartida, solo las integrantes que la coordinación autorizó con su correo. Si no, solo quien use este navegador. Los mensajes traen datos personales de la comunidad: úsalos solo para coordinar la agenda de la fundación (Ley 1581 de 2012).</p></details>
   <p class="hint" style="margin-top:16px">Fondacio Agenda · versión ${VERSION} · Proyecto con la Universidad Católica de Colombia</p></div>`);
   $("#x").onclick=cerrar;
   $("#hTour").onclick=()=>{cerrar();tour.iniciar(true)};
@@ -1230,6 +1250,7 @@ const tour={
       {s:pend,t:"Decide con un toque",x:"Aceptar la pasa al calendario y abre WhatsApp con la respuesta lista. Preguntar pide lo que falta. Rechazar responde con amabilidad.",prep:()=>panel(false)},
       {s:"#bImp",t:"Importar un chat completo",x:"Para los grupos: exporta el chat desde WhatsApp y pégalo. La agenda encuentra las invitaciones entre todos los mensajes."},
       {s:"#tAsis",t:"Asistente con IA (opcional)",x:"Pregúntale «¿qué hay esta semana?» o pídele redactar una invitación. Se activa con una clave gratuita en Ajustes."},
+      {s:"#bNube",t:"Una sola agenda para todo el equipo",x:"Entra con tu Gmail y verás la misma agenda que las demás integrantes, con los cambios al instante. La coordinación decide quién tiene acceso."},
       {s:"#bShare",t:"Compartir e informe del mes",x:"Envía la agenda de la semana a un grupo de WhatsApp, imprímela para la cartelera o saca el informe del mes para aliados y donantes."},
       {s:"#bSet",t:"Ajustes",x:"La IA, Google Meet, la copia de seguridad para no perder nada y la opción de letra más grande."},
       {s:"#bHelp",t:"Ayuda siempre a mano",x:"Aquí encuentras guías cortas, preguntas frecuentes y puedes repetir este recorrido cuando quieras."},
@@ -1401,7 +1422,180 @@ $("#sug").onclick=e=>{if(e.target.tagName==="BUTTON")enviar(e.target.textContent
 dlg.addEventListener("click",e=>{if(e.target===dlg)cerrar()});
 dlg.addEventListener("click",e=>{const c=e.target.closest("[data-copiar]");if(c)navigator.clipboard.writeText(c.dataset.copiar).then(()=>toast("Link copiado"),()=>toast("No se pudo copiar"))});
 
-aplicarApariencia();render();renderChat();
+/* ---------- agenda compartida en la nube (Firebase Firestore) ----------
+   Todas las integrantes autorizadas ven y editan las mismas actividades, los mismos pendientes y los mismos correos.
+   Cada navegador conserva además una copia local, así que la agenda sigue funcionando sin internet:
+   lo que se cambie sin conexión se sube solo cuando vuelve. Si nadie entra, todo funciona como antes, solo en este navegador.
+   La configuración de Firebase no es secreta: el acceso lo controlan las reglas de seguridad (ver firestore.rules). */
+const FB_CFG={apiKey:"AIzaSyBaSUm3GVEEcnMv3tVJugs6ap4rEpPi0BU",authDomain:"fondacio-agenda.firebaseapp.com",projectId:"fondacio-agenda",appId:"1:1057600977627:web:8a75c5c885ebe3755c6afe"};
+const FB_BASE=window.FB_BASE||"https://www.gstatic.com/firebasejs/10.14.1/";
+const ESPACIO="fondacio";            // una sola agenda compartida para toda la fundación
+const ADMIN_INICIAL="carpo0622@gmail.com"; // quien crea la agenda compartida la primera vez (debe coincidir con firestore.rules)
+const COLS=["eventos","pend"];
+const nube={estado:"local",user:null,correo:"",miembros:[],admins:[],fb:null,db:null,auth:null,ref:null,subs:[],
+  ult:{eventos:new Map(),pend:new Map(),contactos:"[]"},listo:{eventos:false,pend:false,contactos:false},err:""};
+window.__nube=true;
+const nubeActiva=()=>nube.estado==="ok";
+const esAdmin=()=>nube.admins.includes(nube.correo);
+const limpiar=x=>{const o=JSON.parse(JSON.stringify(x));for(const k of Object.keys(o))if(k[0]==="_")delete o[k];return o};
+const guardarLocal=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+async function nubeIniciar(){
+  nube.estado="cargando";renderNube();
+  try{
+    const [a,au,fs]=await Promise.all([import(FB_BASE+"firebase-app.js"),import(FB_BASE+"firebase-auth.js"),import(FB_BASE+"firebase-firestore.js")]);
+    nube.fb={...a,...au,...fs};
+    const app=a.initializeApp(FB_CFG);
+    nube.auth=au.getAuth(app);
+    try{nube.db=fs.initializeFirestore(app,{localCache:fs.persistentLocalCache({tabManager:fs.persistentMultipleTabManager()})})}
+    catch(e){nube.db=fs.getFirestore(app)}
+    au.onAuthStateChanged(nube.auth,u=>{nubeUsuario(u)});
+  }catch(e){nube.estado="error";nube.err="No se pudo cargar la conexión con la nube. La agenda sigue funcionando en este navegador.";renderNube()}
+}
+async function nubeEntrar(){
+  if(!nube.auth){toast(navigator.onLine?"La conexión con la nube no cargó. Recarga la página.":"Necesitas internet para entrar la primera vez");return}
+  const {GoogleAuthProvider,signInWithPopup}=nube.fb;const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
+  try{await signInWithPopup(nube.auth,p)}
+  catch(e){const c=e&&e.code||"";
+    if(c==="auth/popup-closed-by-user"||c==="auth/cancelled-popup-request")return;
+    toast(c==="auth/popup-blocked"?"El navegador bloqueó la ventana de Google: permite las ventanas emergentes":c==="auth/unauthorized-domain"?"Esta dirección no está autorizada en Firebase":"No se pudo entrar: "+(e.message||c))}
+}
+async function nubeSalir(){
+  if(!confirm("Vas a salir de la agenda compartida en este navegador. Lo que ya ves se queda aquí como copia, pero dejará de actualizarse. ¿Salir?"))return;
+  try{await nube.fb.signOut(nube.auth)}catch(e){}
+}
+function nubeParar(){nube.subs.forEach(f=>{try{f()}catch(e){}});nube.subs=[];nube.listo={eventos:false,pend:false,contactos:false}}
+async function nubeUsuario(u){
+  nubeParar();
+  if(!u){nube.user=null;nube.correo="";nube.miembros=[];nube.admins=[];nube.estado="fuera";renderNube();return}
+  nube.user=u;nube.correo=String(u.email||"").toLowerCase();nube.estado="cargando";renderNube();
+  const {doc,getDoc,setDoc,onSnapshot,collection,serverTimestamp}=nube.fb;
+  nube.ref=doc(nube.db,"espacios",ESPACIO);
+  let snap;
+  try{snap=await getDoc(nube.ref)}
+  catch(e){nube.estado=e&&e.code==="permission-denied"?"sinAcceso":"error";nube.err=e&&e.message||"";renderNube();return}
+  if(!snap.exists()){
+    if(nube.correo!==ADMIN_INICIAL){nube.estado="sinAcceso";renderNube();return}
+    try{await setDoc(nube.ref,{nombre:"Fundación Fondacio",admins:[nube.correo],miembros:[nube.correo],creado:serverTimestamp()})}
+    catch(e){nube.estado="error";nube.err=e&&e.message||"";renderNube();return}
+  }
+  const fallo=e=>{nubeParar();nube.estado=e&&e.code==="permission-denied"?"sinAcceso":"error";nube.err=e&&e.message||"";renderNube()};
+  nube.subs.push(onSnapshot(nube.ref,s=>{
+    const d=s.data()||{};nube.miembros=(d.miembros||[]).slice();nube.admins=(d.admins||[]).slice();
+    if(!nube.miembros.includes(nube.correo)){fallo({code:"permission-denied"});return}
+    if(nube.estado!=="ok"){nube.estado="ok";}
+    renderNube()},fallo));
+  for(const col of COLS)nube.subs.push(onSnapshot(collection(nube.ref,col),s=>recibir(col,s.docs.map(d=>({...limpiar(d.data()),id:d.id}))),fallo));
+  nube.subs.push(onSnapshot(doc(nube.ref,"datos","contactos"),s=>recibirContactos(s.exists()?(s.data().lista||[]):null),fallo));
+}
+/* La primera vez que una persona entra, lo que tenía en su navegador se suma a la agenda compartida (sin borrar nada).
+   Los datos de ejemplo no se suben. */
+const primeraVez=()=>S.cfg.nubeUid!==(nube.user&&nube.user.uid);
+function recibir(col,items){
+  /* ult = lo que hay en la nube; S = lo que se muestra. Lo que no coincida se sube en nubeSubir(). */
+  nube.ult[col]=new Map(items.map(x=>[x.id,JSON.stringify(x)]));
+  if(!nube.listo[col]){
+    nube.listo[col]=true;
+    if(primeraVez()&&!S.ejemplo){const ids=new Set(items.map(x=>x.id));
+      items=items.concat(S[col].filter(x=>x&&x.id&&!ids.has(x.id)).map(limpiar))}
+  }
+  /* se conservan los mismos objetos para que un formulario abierto siga apuntando a la misma actividad */
+  const prev=new Map(S[col].map(x=>[x.id,x]));
+  const nuevos=items.map(it=>{const o=prev.get(it.id);if(!o)return it;for(const k of Object.keys(o))delete o[k];return Object.assign(o,it)});
+  if(col==="pend")nuevos.sort((a,b)=>String(b.recibido||"").localeCompare(String(a.recibido||"")));
+  S[col]=nuevos;terminarRecibir();
+}
+function recibirContactos(lista){
+  nube.ult.contactos=JSON.stringify(lista||[]);
+  if(!nube.listo.contactos){nube.listo.contactos=true;if(primeraVez())lista=[...new Set([...(lista||[]),...S.contactos])]}
+  S.contactos=(lista||[]).slice();terminarRecibir();
+}
+function terminarRecibir(){
+  if(nube.listo.eventos&&nube.listo.pend&&nube.listo.contactos&&primeraVez()){
+    S.cfg.nubeUid=nube.user.uid;S.ejemplo=false;
+    setTimeout(()=>toast("Listo: tu agenda ahora es compartida con el equipo"),300)}
+  guardarLocal();nubeSubir();render();renderNube();
+}
+/* Sube solo lo que cambió: actividades y mensajes nuevos, editados o borrados. Sin internet queda en cola y sale después. */
+function nubeSubir(){
+  if(!nubeActiva()||!nube.listo.eventos||!nube.listo.pend||!nube.listo.contactos)return;
+  const {doc,collection,writeBatch,serverTimestamp}=nube.fb;const ops=[];
+  for(const col of COLS){
+    const cur=new Map(S[col].filter(x=>x&&x.id).map(x=>[x.id,JSON.stringify(limpiar(x))]));
+    for(const [id,j] of cur)if(nube.ult[col].get(id)!==j)ops.push(b=>b.set(doc(collection(nube.ref,col),id),{...JSON.parse(j),_por:nube.correo,_mod:serverTimestamp()}));
+    for(const id of nube.ult[col].keys())if(!cur.has(id))ops.push(b=>b.delete(doc(collection(nube.ref,col),id)));
+    nube.ult[col]=cur;
+  }
+  const lc=JSON.stringify(S.contactos||[]);
+  if(lc!==nube.ult.contactos){nube.ult.contactos=lc;ops.push(b=>b.set(doc(nube.ref,"datos","contactos"),{lista:S.contactos.slice(),_por:nube.correo,_mod:serverTimestamp()}))}
+  for(let i=0;i<ops.length;i+=400){const b=writeBatch(nube.db);ops.slice(i,i+400).forEach(f=>f(b));
+    b.commit().catch(e=>{toast("No se pudo guardar en la agenda compartida: "+(e&&e.code==="permission-denied"?"tu correo ya no tiene acceso":e.message||e));nube.err=String(e&&e.message||e)})}
+}
+/* ---------- integrantes (solo coordinación) ---------- */
+async function nubeMiembros(cambio){
+  const {updateDoc,arrayUnion,arrayRemove}=nube.fb;
+  try{await updateDoc(nube.ref,cambio(arrayUnion,arrayRemove))}
+  catch(e){toast(e&&e.code==="permission-denied"?"Solo la coordinación puede cambiar quién tiene acceso":"No se pudo guardar: "+(e.message||e))}
+}
+const correoValido=c=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c);
+function renderNube(){
+  const b=$("#bNube");if(!b)return;
+  const off=!navigator.onLine,n=nube.miembros.length;
+  const t={local:"Solo en este equipo",cargando:"Conectando…",fuera:"Toca para compartir con el equipo",ok:off?"Compartida · sin internet":"Compartida",sinAcceso:"Tu correo no tiene acceso",error:"Solo en este equipo · sin conexión"}[nube.estado]||"";
+  b.querySelector(".nube-p").className="nube-p "+(nube.estado==="ok"?(off?"esp":"ok"):nube.estado==="sinAcceso"?"mal":"");
+  $("#nubeEst").textContent=nube.estado==="ok"&&!off?`Compartida · ${n} integrante${n===1?"":"s"}`:t;
+  b.title=nube.estado==="ok"?(off?"Sin internet: lo que cambies se guarda aquí y se sube cuando vuelva la conexión":`Sincronizada con ${n} integrante${n===1?"":"s"}`):"Ver la agenda compartida del equipo";
+  const h=$("#nubeHint");if(h)h.textContent=nubeActiva()?"La agenda está en la nube: la ven y la editan todas las integrantes autorizadas. Igual conviene descargar una copia de vez en cuando.":"La agenda se guarda solo en este navegador. Para que todo el equipo vea lo mismo, toca «Agenda del equipo» y entra con tu Gmail. Descarga una copia cada semana para no perder nada.";
+  if(dlg.open&&dlg.querySelector("#fNube"))nubeDialogo(true);
+}
+function nubeDialogo(refrescar){
+  const e=nube.estado,yo=esc(nube.correo);
+  let cuerpo="";
+  if(e==="ok"){
+    const adm=esAdmin();
+    cuerpo=`<p class="hint" style="margin:0 0 10px">Entraste como <strong>${yo}</strong>. Todas las integrantes de la lista ven las mismas actividades y pendientes, y los cambios aparecen al instante en sus equipos. Sin internet puedes seguir trabajando: se sube solo cuando vuelve la conexión.</p>
+    <h3>Integrantes con acceso</h3>
+    <ul class="miembros">${nube.miembros.map(m=>`<li><span>${esc(m)}${nube.admins.includes(m)?` <span class="pill">coordinación</span>`:""}${m===nube.correo?` <span class="pill ok">tú</span>`:""}</span>${adm&&m!==nube.correo?`<span class="row"><button type="button" class="btn sm" data-adm="${esc(m)}">${nube.admins.includes(m)?"Quitar coordinación":"Hacer coordinación"}</button><button type="button" class="btn sm del" data-quitar="${esc(m)}">Quitar</button></span>`:""}</li>`).join("")}</ul>
+    ${adm?`<label>Agregar integrante (su correo de Gmail)<input type="email" id="nCorreo" placeholder="nombre@gmail.com" autocomplete="off"></label>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn pri sm" id="nAdd">Dar acceso</button></div>
+    <p class="hint">Después de darle acceso, la persona abre esta misma dirección, toca <strong>Agenda del equipo</strong> y entra con ese correo.</p>`:`<p class="hint">Para agregar a alguien, pídeselo a la coordinación.</p>`}
+    <div class="row" style="margin-top:14px"><button type="button" class="btn sm" id="nSalir">Salir de la cuenta</button></div>`;
+  }else if(e==="sinAcceso"){
+    cuerpo=`<p>Entraste como <strong>${yo}</strong>, pero ese correo todavía no tiene acceso a la agenda compartida.</p>
+    <p class="hint">Pídele a la coordinación que te agregue en <strong>Agenda compartida → Agregar integrante</strong>. Mientras tanto, la agenda funciona solo en este navegador.</p>
+    <div class="row" style="margin-top:12px"><button type="button" class="btn pri" id="nOtra">Entrar con otra cuenta</button><button type="button" class="btn" id="nSalir">Salir</button></div>`;
+  }else if(e==="cargando"){
+    cuerpo=`<p>Conectando con la agenda compartida…</p>`;
+  }else if(e==="error"){
+    cuerpo=`<p>${esc(nube.err||"No se pudo conectar con la agenda compartida.")}</p><p class="hint">Revisa el internet y recarga la página. La agenda sigue funcionando en este navegador.</p>
+    ${nube.auth?`<div class="row" style="margin-top:12px"><button type="button" class="btn pri" id="nEntrar">Intentar de nuevo</button></div>`:""}`;
+  }else{
+    cuerpo=`<p>Con la agenda compartida, <strong>todas las integrantes ven las mismas actividades y los mismos pendientes</strong>, desde el computador o el celular, y los cambios aparecen al instante.</p>
+    <ol class="hint" style="padding-left:20px"><li>Toca <strong>Entrar con Google</strong> y elige tu correo.</li><li>Si la coordinación ya te dio acceso, verás la agenda del equipo.</li><li>Lo que tenías en este navegador se suma a la agenda compartida, sin borrar nada.</li></ol>
+    <div class="row" style="margin-top:12px"><button type="button" class="btn pri" id="nEntrar">Entrar con Google</button></div>
+    <p class="hint">Si prefieres no entrar, la agenda sigue funcionando solo en este navegador, como antes.</p>`;
+  }
+  const html=`<div id="fNube"><div class="row between"><h2>Agenda compartida</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>${cuerpo}</div>`;
+  if(refrescar){const cont=dlg.querySelector("#fNube");if(!cont)return;cont.outerHTML=html}else abrir(html);
+  $("#x").onclick=cerrar;
+  const en=$("#nEntrar");if(en)en.onclick=nubeEntrar;
+  const ot=$("#nOtra");if(ot)ot.onclick=async()=>{try{await nube.fb.signOut(nube.auth)}catch(e){}nubeEntrar()};
+  const sa=$("#nSalir");if(sa)sa.onclick=nubeSalir;
+  const ad=$("#nAdd");if(ad){const inp=$("#nCorreo");
+    const agregar=()=>{const c=inp.value.trim().toLowerCase();if(!correoValido(c)){toast("Escribe un correo válido");inp.focus();return}
+      if(nube.miembros.includes(c)){toast("Ese correo ya tiene acceso");return}
+      nubeMiembros(U=>({miembros:U(c)})).then(()=>toast("Listo: "+c+" ya tiene acceso"))};
+    ad.onclick=agregar;inp.onkeydown=ev=>{if(ev.key==="Enter"){ev.preventDefault();agregar()}}}
+  dlg.querySelectorAll("[data-quitar]").forEach(x=>x.onclick=()=>{const c=x.dataset.quitar;
+    if(confirm(`¿Quitarle el acceso a ${c}? Dejará de ver la agenda compartida.`))nubeMiembros((U,R)=>({miembros:R(c),admins:R(c)}))});
+  dlg.querySelectorAll("[data-adm]").forEach(x=>x.onclick=()=>{const c=x.dataset.adm,es=nube.admins.includes(c);
+    nubeMiembros((U,R)=>({admins:es?R(c):U(c)}))});
+}
+addEventListener("online",renderNube);addEventListener("offline",renderNube);
+
+$("#bNube").onclick=()=>nubeDialogo();
+aplicarApariencia();render();renderChat();renderNube();
+if(location.protocol!=="file:")nubeIniciar();
 /* La primera vez que alguien abre la agenda en este navegador, aparece el recorrido guiado. */
 let tourVisto=true;try{tourVisto=!!localStorage.getItem(TOUR_KEY)}catch(e){}
 if(!tourVisto&&!/[?&]sinTour\b/.test(location.search))setTimeout(()=>tour.iniciar(false),500);
