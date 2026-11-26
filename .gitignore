@@ -1,8 +1,11 @@
-# Solo se sube la página, su README, el ejemplo de clave y las pruebas.
+# Solo se suben las páginas, el README, las reglas de la base de datos, el ejemplo de clave y las pruebas.
 /*
 !/.gitignore
 !/README.md
 !/fondacio.html
+!/index.html
+!/privacidad.html
+!/firestore.rules
 !/clave.example.js
 !/pruebas/
 /pruebas/copia_prueba.json
