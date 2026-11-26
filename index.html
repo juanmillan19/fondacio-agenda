@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fundación Fondacio · Altos de Cazucá</title>
+<meta name="description" content="Fundación Fondacio acompaña a las familias de Altos de Cazucá (Soacha) con formación, comunidad y economía circular. Conoce cómo ayudar.">
+<meta property="og:title" content="Fundación Fondacio · Altos de Cazucá">
+<meta property="og:description" content="Formación, comunidad y economía circular con las familias de Altos de Cazucá. Dona, sé voluntario o súmate como aliado.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231F3A68'/%3E%3Cpath d='M10 46 L24 30 L34 38 L46 24 L56 34 L56 54 L10 54Z' fill='%23F6C445'/%3E%3Ccircle cx='46' cy='16' r='6' fill='%23E8553D'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: cálido y directo, como un cartel de barrio hecho con la comunidad.
+   IDEA: un mural de ladera; las casas de colores de Cazucá suben hacia el sol.
+   PICTURE: la ladera ilustrada con casas de los cuatro colores de los ejes.
+   COLOUR and TYPE: azul noche dominante, amarillo girasol de apoyo, coral de acento; Baloo 2 y Nunito Sans.
+   LAYOUT: portada con la ladera, ejes en franja amarilla, formas de ayudar, economía circular, contacto. */
+:root{color-scheme:light dark;
+  --bg:light-dark(#FFFFFF,#0E1A2E);--ink:light-dark(#14213D,#EEF2FA);--ink2:light-dark(#3D4A66,#B9C3D8);
+  --azul:#1F3A68;--sol:#F6C445;--coral:#E8553D;--verde:#2E8B57;--morado:#7B3FBF;
+  --panel:light-dark(#F3F6FB,#16243D);--linea:light-dark(#DDE3EE,#2A3A58)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Nunito Sans",system-ui,Arial,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Baloo 2","Nunito Sans",Arial,sans-serif;line-height:1.05;margin:0;text-wrap:balance}
+h1{font-size:clamp(38px,6vw,60px);font-weight:800}
+h2{font-size:clamp(30px,4vw,44px);font-weight:800}
+h3{font-size:24px;font-weight:600}
+p{margin:0 0 14px}
+a{color:inherit}
+.band{padding:clamp(36px,6vw,80px) max(5vw,18px)}
+.in{max-width:1180px;margin:0 auto}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 22px;border-radius:999px;font-weight:700;font-size:16px;text-decoration:none;border:2px solid transparent;cursor:pointer;font-family:inherit}
+.btn:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--sol);outline-offset:3px}
+.b-sol{background:var(--sol);color:#14213D}
+.b-sol:hover{filter:brightness(1.05)}
+.b-borde{border-color:currentColor;background:transparent;color:inherit}
+.b-borde:hover{background:rgba(255,255,255,.08)}
+
+/* barra */
+nav.top{position:sticky;top:0;z-index:5;background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px max(5vw,18px)}
+nav.top .marca{display:flex;align-items:center;gap:10px;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:22px;text-decoration:none}
+nav.top .enl{display:flex;gap:18px;flex-wrap:wrap}
+nav.top .enl a{text-decoration:none;font-weight:700;font-size:15px;opacity:.9}
+nav.top .enl a:hover{opacity:1;text-decoration:underline}
+@media(max-width:760px){nav.top .enl{display:none}}
+
+/* portada */
+.portada{background:var(--azul);color:#fff;padding-bottom:0;overflow:hidden}
+.portada .in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(20px,4vw,48px);align-items:end}
+.portada .txt{padding-bottom:clamp(36px,6vw,80px)}
+.portada .lugar{font-weight:700;color:var(--sol);margin:0 0 12px}
+.portada p.intro{font-size:19px;color:#DCE4F3;max-width:34em;margin:18px 0 26px}
+.portada .acc{display:flex;flex-wrap:wrap;gap:12px}
+.ladera{display:block;width:100%;height:auto;align-self:end}
+@media(max-width:860px){.portada .in{grid-template-columns:1fr}.portada .txt{padding-bottom:8px}}
+
+/* ejes */
+.ejes{background:var(--sol);color:#14213D}
+.ejes .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:28px}
+.eje{background:#fff;border-radius:22px;padding:22px 20px;box-shadow:0 2px 0 rgba(20,33,61,.12)}
+.eje .pt{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;margin-bottom:14px}
+.eje .pt svg{width:28px;height:28px}
+.eje p{color:#3D4A66;font-size:16px;margin:8px 0 0}
+@media(max-width:980px){.ejes .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.ejes .grid{grid-template-columns:1fr}}
+
+/* ayudar */
+.ayudar .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:28px}
+.forma{border:2px solid var(--linea);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.forma .num{font-family:"Baloo 2",sans-serif;font-weight:800;color:var(--coral);font-size:18px}
+.forma ul{margin:6px 0 14px;padding-left:20px;color:var(--ink2)}
+.forma .btn{align-self:flex-start;margin-top:auto}
+.forma .b-coral{background:var(--coral);color:#fff}
+@media(max-width:760px){.ayudar .grid{grid-template-columns:1fr}}
+
+/* economía circular */
+.circular{background:var(--panel)}
+.circular .in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,64px);align-items:center}
+.pasos{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px}
+.pasos li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:start}
+.pasos b.n{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--azul);color:#fff;font-family:"Baloo 2",sans-serif;font-size:20px}
+.pasos strong{display:block;font-size:18px}
+.pasos span{color:var(--ink2)}
+.ciclo{width:100%;height:auto;max-width:440px;justify-self:center}
+@media(max-width:860px){.circular .in{grid-template-columns:1fr}.ciclo{max-width:320px;order:-1}}
+
+/* contacto */
+.contacto{background:var(--azul);color:#fff}
+.contacto .in{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px;align-items:center}
+.contacto p{color:#DCE4F3}
+.tarj{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:22px;display:grid;gap:12px}
+.tarj .fila{display:flex;flex-wrap:wrap;gap:10px}
+.tarj small{color:#B9C3D8}
+@media(max-width:860px){.contacto .in{grid-template-columns:1fr}}
+footer{padding:22px max(5vw,18px);font-size:14px;color:var(--ink2);border-top:1px solid var(--linea)}
+footer .in{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+.aviso{position:fixed;left:50%;bottom:20px;visibility:hidden;opacity:0;transform:translateX(-50%) translateY(20px);background:#14213D;color:#fff;padding:12px 20px;border-radius:12px;font-size:15px;transition:transform .25s;z-index:9;max-width:calc(100vw - 32px)}
+.aviso.on{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}
+.aviso{transition:transform .25s,opacity .25s,visibility .25s}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.aviso{transition:none}}
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="Principal">
+  <a class="marca" href="#inicio"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#F6C445"/><path d="M10 46 L24 30 L34 38 L46 24 L56 34 L56 54 L10 54Z" fill="#1F3A68"/><circle cx="46" cy="16" r="6" fill="#E8553D"/></svg>Fondacio</a>
+  <div class="enl"><a href="#que-hacemos">Qué hacemos</a><a href="#ayudar">Cómo ayudar</a><a href="#economia-circular">Economía circular</a><a href="#contacto">Contacto</a></div>
+  <a class="btn b-sol" href="#ayudar" style="min-height:40px;padding:0 16px">Quiero ayudar</a>
+</nav>
+
+<header class="band portada" id="inicio">
+  <div class="in">
+    <div class="txt">
+      <p class="lugar">Altos de Cazucá · Soacha, Cundinamarca</p>
+      <h1>Fundación Fondacio</h1>
+      <p class="intro">Acompañamos a las familias de Altos de Cazucá con talleres, jornadas comunitarias y una economía circular que convierte la ropa donada en recursos para la comunidad. Hay muchas formas de sumarte.</p>
+      <div class="acc"><a class="btn b-sol" href="#ayudar">Quiero ayudar</a><a class="btn b-borde" href="#que-hacemos">Conoce lo que hacemos</a></div>
+    </div>
+    <svg class="ladera" viewBox="0 0 640 420" role="img" aria-label="Ilustración de la ladera de Altos de Cazucá con casas de colores y el sol">
+      <defs>
+        <linearGradient id="loma1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3C8F63"/><stop offset="1" stop-color="#2E7350"/></linearGradient>
+        <linearGradient id="loma2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E8B57"/><stop offset="1" stop-color="#1F6B42"/></linearGradient>
+        <g id="casa"><rect x="-16" y="-20" width="32" height="24" rx="2"/><path d="M-20 -18 L0 -34 L20 -18Z" fill="#14213D" opacity=".85"/><rect x="-5" y="-10" width="10" height="14" fill="#14213D" opacity=".55"/><rect x="-13" y="-15" width="6" height="6" fill="#fff" opacity=".75"/></g>
+      </defs>
+      <circle cx="470" cy="96" r="72" fill="#F6C445" opacity=".14"/>
+      <circle cx="470" cy="96" r="48" fill="#F6C445"/>
+      <path d="M0 260 C120 190 230 170 340 150 C440 132 540 160 640 120 L640 420 L0 420Z" fill="url(#loma1)"/>
+      <g>
+        <use href="#casa" x="300" y="166" fill="#F6C445"/><use href="#casa" x="348" y="158" fill="#E8553D"/><use href="#casa" x="396" y="152" fill="#fff"/>
+        <use href="#casa" x="444" y="150" fill="#7B3FBF"/><use href="#casa" x="560" y="140" fill="#F6C445"/><use href="#casa" x="250" y="180" fill="#8AB4FF"/>
+        <use href="#casa" x="200" y="198" fill="#E8553D"/><use href="#casa" x="150" y="214" fill="#F6C445"/>
+      </g>
+      <path d="M0 330 C110 270 220 252 330 250 C450 248 540 228 640 210 L640 420 L0 420Z" fill="url(#loma2)"/>
+      <g>
+        <use href="#casa" x="70" y="300" fill="#fff"/><use href="#casa" x="118" y="286" fill="#7B3FBF"/><use href="#casa" x="166" y="276" fill="#F6C445"/>
+        <use href="#casa" x="214" y="268" fill="#E8553D"/><use href="#casa" x="262" y="262" fill="#8AB4FF"/><use href="#casa" x="380" y="256" fill="#fff"/>
+        <use href="#casa" x="428" y="250" fill="#F6C445"/><use href="#casa" x="520" y="234" fill="#E8553D"/><use href="#casa" x="580" y="226" fill="#7B3FBF"/>
+      </g>
+      <path d="M0 420 L0 372 C150 340 330 338 470 324 C540 318 600 306 640 300 L640 420Z" fill="#F6C445"/>
+      <path d="M40 420 C120 392 200 380 320 372" stroke="#14213D" stroke-width="4" fill="none" stroke-dasharray="2 12" stroke-linecap="round" opacity=".35"/>
+    </svg>
+  </div>
+</header>
+
+<section class="band ejes" id="que-hacemos" aria-labelledby="t-ejes">
+  <div class="in">
+    <h2 id="t-ejes">Lo que hacemos, en cuatro ejes</h2>
+    <div class="grid">
+      <article class="eje"><div class="pt" style="background:#E9EEFC"><svg viewBox="0 0 24 24" fill="#1F4FD8" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3zm-6 9.2V16c0 1.9 2.7 4 6 4s6-2.1 6-4v-3.8L12 15l-6-2.8z"/></svg></div>
+        <h3>Formación</h3><p>Talleres prácticos, como los de habilidades digitales y herramientas de inteligencia artificial, pensados para resolver necesidades reales.</p></article>
+      <article class="eje"><div class="pt" style="background:#E6F4EA"><svg viewBox="0 0 24 24" fill="#0B7A3E" aria-hidden="true"><path d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-2.7 0-8 1.3-8 4v3h16v-3c0-2.7-5.3-4-8-4zm8 0c-.3 0-.7 0-1.1.1 1.3.9 2.1 2.2 2.1 3.9v3h7v-3c0-2.7-5.3-4-8-4z"/></svg></div>
+        <h3>Comunidad</h3><p>Jornadas con las familias del barrio, visitas y trabajo conjunto con juntas de acción comunal y organizaciones amigas.</p></article>
+      <article class="eje"><div class="pt" style="background:#FDEFD9"><svg viewBox="0 0 24 24" fill="#B45309" aria-hidden="true"><path d="M12 4V1L8 5l4 4V6a6 6 0 0 1 5.7 7.9l1.5 1.5A8 8 0 0 0 12 4zm0 14a6 6 0 0 1-5.7-7.9L4.8 8.6A8 8 0 0 0 12 20v3l4-4-4-4v3z"/></svg></div>
+        <h3>Economía circular</h3><p>Recibimos ropa y objetos donados y los ponemos a circular en ferias que generan recursos para la fundación.</p></article>
+      <article class="eje"><div class="pt" style="background:#F1E8FB"><svg viewBox="0 0 24 24" fill="#7B3FBF" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg></div>
+        <h3>Equipo</h3><p>Coordinación y voluntariado que hacen posible cada actividad, organizados con la agenda de la fundación.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="band ayudar" id="ayudar" aria-labelledby="t-ayudar">
+  <div class="in">
+    <h2 id="t-ayudar">Cómo puedes ayudar</h2>
+    <p style="color:var(--ink2);max-width:40em;margin-top:12px">Sabemos que hay muchas personas que quieren apoyar a la comunidad. Escoge la forma que te quede mejor y escríbenos.</p>
+    <div class="grid">
+      <article class="forma"><span class="num">1</span><h3>Dona ropa y objetos</h3>
+        <ul><li>Ropa en buen estado para todas las edades.</li><li>Objetos útiles para el hogar.</li><li>Todo entra a la economía circular de la fundación.</li></ul>
+        <a class="btn b-coral" data-msg="Hola, quiero donar ropa u objetos a la Fundación Fondacio. ¿Cómo puedo entregarlos?" href="#contacto">Quiero donar</a></article>
+      <article class="forma"><span class="num">2</span><h3>Sé voluntario</h3>
+        <ul><li>Apoya talleres y jornadas con las familias.</li><li>Ayuda en las ferias de economía circular.</li><li>Comparte lo que sabes hacer.</li></ul>
+        <a class="btn b-coral" data-msg="Hola, me gustaría ser voluntario en la Fundación Fondacio. ¿Cómo puedo empezar?" href="#contacto">Quiero ser voluntario</a></article>
+      <article class="forma"><span class="num">3</span><h3>Apoya con recursos</h3>
+        <ul><li>Aportes para materiales de talleres y jornadas.</li><li>Patrocinio de una actividad del mes.</li><li>Te contamos en qué se usa cada aporte.</li></ul>
+        <a class="btn b-coral" data-msg="Hola, quiero apoyar con recursos a la Fundación Fondacio. ¿Cómo puedo hacerlo?" href="#contacto">Quiero aportar</a></article>
+      <article class="forma"><span class="num">4</span><h3>Súmate como aliado</h3>
+        <ul><li>Empresas, colegios, universidades y organizaciones.</li><li>Proyectos conjuntos con la comunidad.</li><li>Espacios, transporte o difusión.</li></ul>
+        <a class="btn b-coral" data-msg="Hola, represento a una organización y nos gustaría aliarnos con la Fundación Fondacio." href="#contacto">Hablemos</a></article>
+    </div>
+  </div>
+</section>
+
+<section class="band circular" id="economia-circular" aria-labelledby="t-circ">
+  <div class="in">
+    <div>
+      <h2 id="t-circ">Economía circular: tu ropa vuelve a la comunidad</h2>
+      <ol class="pasos">
+        <li><b class="n">1</b><div><strong>Donas</strong><span>Ropa y objetos que ya no usas, en buen estado.</span></div></li>
+        <li><b class="n">2</b><div><strong>Clasificamos</strong><span>El equipo y los voluntarios organizan lo que llega.</span></div></li>
+        <li><b class="n">3</b><div><strong>Circula</strong><span>Lo ofrecemos en ferias a precios accesibles para el barrio.</span></div></li>
+        <li><b class="n">4</b><div><strong>Vuelve como recursos</strong><span>Lo recaudado apoya las actividades de la fundación.</span></div></li>
+      </ol>
+    </div>
+    <svg class="ciclo" viewBox="0 0 320 320" role="img" aria-label="Ciclo de la economía circular: donar, clasificar, circular y recursos">
+      <circle cx="160" cy="160" r="112" fill="none" stroke="var(--linea)" stroke-width="22"/>
+      <path d="M160 48 A112 112 0 0 1 272 160" fill="none" stroke="#E8553D" stroke-width="22" stroke-linecap="round"/>
+      <path d="M272 160 A112 112 0 0 1 160 272" fill="none" stroke="#F6C445" stroke-width="22" stroke-linecap="round"/>
+      <path d="M160 272 A112 112 0 0 1 48 160" fill="none" stroke="#2E8B57" stroke-width="22" stroke-linecap="round"/>
+      <path d="M48 160 A112 112 0 0 1 160 48" fill="none" stroke="#1F3A68" stroke-width="22" stroke-linecap="round"/>
+      <circle cx="160" cy="160" r="70" fill="var(--bg)"/>
+      <path d="M128 132 l14 -14 h36 l14 14 l-14 10 v40 h-36 v-40z" fill="#E8553D"/>
+      <path d="M150 118 q10 12 20 0" fill="none" stroke="#14213D" stroke-width="4" opacity=".5"/>
+    </svg>
+  </div>
+</section>
+
+<section class="band contacto" id="contacto" aria-labelledby="t-cont">
+  <div class="in">
+    <div>
+      <h2 id="t-cont">Escríbenos</h2>
+      <p style="margin-top:12px">Estamos en Altos de Cazucá, Soacha (Cundinamarca). La coordinación de la fundación te responde y te cuenta cómo sumarte.</p>
+      <p id="pendiente" hidden>Muy pronto publicaremos aquí el WhatsApp y el correo de la coordinación.</p>
+    </div>
+    <div class="tarj" id="tarj">
+      <div class="fila" id="botones"></div>
+      <small id="datos"></small>
+      <div class="fila"><button class="btn b-borde" id="bComp" type="button">Compartir esta página</button></div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="in"><span>Fundación Fondacio · Altos de Cazucá, Soacha</span><span>Página hecha con la comunidad, proyecto con la Universidad Católica de Colombia · 2026</span></div></footer>
+<div class="aviso" id="aviso" role="status"></div>
+
+<script>
+{
+  /* ===== Datos de contacto: los llena la fundación. Si están vacíos, la página lo dice. ===== */
+  const CONTACTO = {
+    whatsapp: "",   // solo números, con indicativo. Ejemplo: 573001234567
+    correo: ""      // ejemplo: contacto@fondacio.org
+  };
+
+  const $ = s => document.querySelector(s);
+  const aviso = t => { const a = $("#aviso"); a.textContent = t; a.classList.add("on"); clearTimeout(aviso.t); aviso.t = setTimeout(() => a.classList.remove("on"), 2600); };
+  const wa = (msg) => "https://wa.me/" + CONTACTO.whatsapp.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
+  const hay = !!(CONTACTO.whatsapp || CONTACTO.correo);
+
+  const botones = $("#botones"), datos = $("#datos");
+  if (CONTACTO.whatsapp) {
+    const a = document.createElement("a"); a.className = "btn b-sol"; a.textContent = "Escribir por WhatsApp";
+    a.href = wa("Hola, quiero saber cómo ayudar a la Fundación Fondacio."); a.target = "_blank"; a.rel = "noopener";
+    botones.appendChild(a);
+  }
+  if (CONTACTO.correo) {
+    const a = document.createElement("a"); a.className = "btn b-borde"; a.textContent = "Enviar un correo";
+    a.href = "mailto:" + CONTACTO.correo; botones.appendChild(a);
+    datos.textContent = "Correo: " + CONTACTO.correo;
+  }
+  if (!hay) { $("#pendiente").hidden = false; botones.hidden = true; datos.hidden = true; }
+
+  /* Cada botón de «Cómo ayudar» abre WhatsApp con un mensaje listo, o lleva a Contacto si aún no hay número. */
+  document.querySelectorAll("[data-msg]").forEach(b => {
+    if (CONTACTO.whatsapp) { b.href = wa(b.dataset.msg); b.target = "_blank"; b.rel = "noopener"; }
+  });
+
+  $("#bComp").addEventListener("click", async () => {
+    const url = location.href.split("#")[0];
+    try {
+      if (navigator.share) { await navigator.share({ title: document.title, text: "Conoce y apoya a la Fundación Fondacio", url }); return; }
+      await navigator.clipboard.writeText(url); aviso("Enlace copiado. Pégalo donde quieras compartirlo.");
+    } catch (e) { aviso("Copia el enlace de la barra del navegador para compartirla."); }
+  });
+}
+</script>
+</body>
+</html>
