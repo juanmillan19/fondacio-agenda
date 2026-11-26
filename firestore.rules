@@ -1,0 +1,41 @@
+rules_version = '2';
+// Reglas de seguridad de la agenda compartida de Fondacio (Cloud Firestore).
+// - Solo entran personas con cuenta de Google cuyo correo esté en la lista "miembros" de espacios/fondacio.
+// - Solo la coordinación ("admins") puede cambiar quién tiene acceso.
+// - La agenda la crea una sola vez la cuenta que administra el proyecto (ADMIN_INICIAL en fondacio.html).
+// Se publican en Firebase console → Firestore Database → Reglas.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function correo() {
+      return request.auth != null && request.auth.token.email_verified == true
+        ? request.auth.token.email.lower() : "";
+    }
+    function espacio(e) {
+      return get(/databases/$(database)/documents/espacios/$(e)).data;
+    }
+
+    match /espacios/{e} {
+      allow get: if correo() != "" && (resource == null || correo() in resource.data.miembros);
+
+      allow create: if e == "fondacio" && correo() == "carpo0622@gmail.com"
+        && request.resource.data.admins == [correo()]
+        && request.resource.data.miembros == [correo()];
+
+      allow update: if correo() != ""
+        && correo() in resource.data.admins
+        && correo() in request.resource.data.admins
+        && request.resource.data.miembros is list
+        && request.resource.data.admins is list
+        && request.resource.data.miembros.hasAll(request.resource.data.admins)
+        && request.resource.data.miembros.size() <= 100;
+
+      // actividades, pendientes y correos de invitados
+      match /{col}/{id} {
+        allow read, write: if col in ["eventos", "pend", "datos"]
+          && correo() != ""
+          && correo() in espacio(e).miembros;
+      }
+    }
+  }
+}
