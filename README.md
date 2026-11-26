@@ -11,6 +11,17 @@ Un calendario sencillo, parecido a Google Calendar, con una bandeja de **pendien
 5. Una IA ayuda a leer los mensajes, a redactar respuestas e invitaciones y a contestar preguntas sobre la agenda.
 6. Se **comparte la agenda** de la semana o del mes por WhatsApp, se imprime para la cartelera y se saca el **informe del mes** (actividades por eje y personas que asistieron) para aliados y donantes.
 7. La primera vez que alguien abre la agenda aparece un **recorrido guiado**. Se repite desde **Ayuda**, que también trae guías cortas y preguntas frecuentes.
+8. **Agenda del equipo:** cada integrante entra con su Gmail y todas ven la misma agenda, con los cambios al instante y funcionando sin internet.
+
+**En línea:** la agenda está en https://carloshernandez2222.github.io/fondacio-agenda/fondacio.html y la página de la fundación en https://carloshernandez2222.github.io/fondacio-agenda/ (política de privacidad en `privacidad.html`).
+
+## Novedades de la versión 1.2
+
+- **Agenda compartida** con Firebase (Cloud Firestore): una sola agenda para todo el equipo. Se entra con Google desde el botón **Agenda del equipo**.
+- La **coordinación** da y quita acceso por correo y puede nombrar a otras coordinadoras. Las reglas de `firestore.rules` impiden que alguien sin acceso lea o escriba.
+- Lo que cada persona tenía en su navegador se suma a la agenda compartida la primera vez (los datos de ejemplo no se suben).
+- Sin internet se sigue trabajando; los cambios se suben solos al volver la conexión.
+- Página de visibilidad de la fundación (`index.html`) y política de privacidad (`privacidad.html`).
 
 ## Novedades de la versión 1.1
 
@@ -28,7 +39,7 @@ Un calendario sencillo, parecido a Google Calendar, con una bandeja de **pendien
 
 ## Cómo usarla
 
-Abre `fondacio.html` en el navegador. No necesita instalación ni servidor.
+Abre `fondacio.html` en el navegador. No necesita instalación ni servidor. Para la agenda del equipo, ábrela desde la dirección web (la agenda compartida no se activa con el archivo abierto con doble clic).
 
 Para activar la IA, entra a **Ajustes**, elige un proveedor (Groq, Gemini y OpenRouter tienen capa gratis) y pega tu clave. También puedes copiar `clave.example.js` como `clave.js` con tu clave, y la página la carga sola. `clave.js` está excluido del repositorio.
 
@@ -89,12 +100,23 @@ Al dar "Crear reunión en Meet" se abre la ventana de Google para elegir la cuen
 
 - **"Google Calendar API has not been used in project…"**: falta habilitar la API (paso 1).
 - **"Error 400: redirect_uri_mismatch" u "origin_mismatch"**: la dirección desde donde abriste la página no está en los orígenes autorizados (paso 3).
-- **"Acceso bloqueado: la app no completó el proceso de verificación"**: esa cuenta no está en los usuarios de prueba (paso 2).
+- **"Acceso bloqueado: la app no completó el proceso de verificación"**: la app está en modo de prueba y esa cuenta no está en los usuarios de prueba. Hoy la app ya está **en producción**, así que no debería pasar.
 - **Cuentas de una organización (Google Workspace):** el administrador puede tener bloqueadas las apps de terceros. En ese caso hay que pedirle que la permita.
 
 ## Datos
 
-Se guardan en el navegador de cada persona (clave `fondacio_v3` de `localStorage`). No se comparten entre dispositivos: para pasarlos a otro computador, en **Ajustes → Tus datos** se descarga una copia de seguridad y se restaura en el otro. La copia no incluye la clave de IA.
+Cada navegador guarda una copia en `localStorage` (clave `fondacio_v3`). Si la persona entra a la **agenda del equipo**, las actividades, los pendientes y los correos de invitados se guardan además en Cloud Firestore:
+
+| Ruta | Contenido |
+|---|---|
+| `espacios/fondacio` | `miembros` (correos con acceso) y `admins` (coordinación) |
+| `espacios/fondacio/eventos/{id}` | una actividad, con `_por` (quién la cambió) y `_mod` |
+| `espacios/fondacio/pend/{id}` | un pendiente |
+| `espacios/fondacio/datos/contactos` | correos guardados para Meet |
+
+La configuración de Firebase (`FB_CFG` en `fondacio.html`) no es secreta; el acceso lo controlan las reglas de `firestore.rules`, publicadas en Firebase. La agenda compartida la crea la primera vez la cuenta de `ADMIN_INICIAL`, que debe coincidir con la de las reglas. El chat con el asistente y la clave de IA no se comparten.
+
+En **Ajustes → Tus datos** se descarga una copia de seguridad y se restaura. La copia no incluye la clave de IA. Con la agenda compartida, restaurar o vaciar cambia la agenda de todas (la página lo advierte).
 
 Los mensajes y actividades de ejemplo no son reales; se borran con **Empezar con mi agenda vacía**. Las reuniones de Meet sí quedan en el Google Calendar de quien las crea.
 
@@ -110,6 +132,13 @@ playwright install chromium
 python pruebas/flujos_v11.py
 ```
 
+`pruebas/compartida_v12.py` prueba la agenda compartida con dos equipos a la vez (41 verificaciones) contra un Firebase simulado (`pruebas/fbmock/`) que aplica las mismas reglas:
+
+```
+python pruebas/servidor_prueba.py      # en una terminal
+python pruebas/compartida_v12.py       # en otra
+```
+
 ## Estado
 
-Versión 1.1. El mensaje o el chat se pega a mano: la lectura automática de WhatsApp es la siguiente fase.
+Versión 1.2. El mensaje o el chat se pega a mano: la lectura automática de WhatsApp es la siguiente fase.
